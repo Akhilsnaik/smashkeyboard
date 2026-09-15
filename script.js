@@ -92,7 +92,7 @@
   }
 
   function updateFontScale() {
-    const t = Math.min(visibleCount / MAX_CHARS, 1);
+    const t = Math.max(0, Math.min(visibleCount / MAX_CHARS, 1));
     const eased = 1 - Math.pow(1 - t, 2);
     const size = MAX_FONT_REM - (MAX_FONT_REM - MIN_FONT_REM) * eased;
     typedLine.style.setProperty('--typed-size', size.toFixed(2) + 'rem');
@@ -138,12 +138,15 @@
   }
 
   function removeLastTyped() {
-    const last = cursor.previousElementSibling;
+    let last = cursor.previousElementSibling;
+    while (last && last.classList.contains('removing')) {
+      last = last.previousElementSibling;
+    }
     if (!last) return;
 
     if (last.classList.contains('typed-emoji')) {
-      visibleCount--;
-      totalTyped--;
+      visibleCount = Math.max(0, visibleCount - 1);
+      totalTyped = Math.max(0, totalTyped - 1);
       updateFontScale();
     }
 
