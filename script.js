@@ -3,16 +3,23 @@
   const hint = document.querySelector('.hint');
   const keyBadge = document.getElementById('keyBadge');
 
-  const EMOJIS = [
+  const ANIMALS = [
     '🐶', '🐱', '🐰', '🦁', '🐸', '🐵', '🐨', '🐼', '🦄', '🐷',
+    '🦋', '🐢', '🐬', '🐥', '🐘', '🦒', '🐮', '🐔', '🐙', '🐳',
+    '🐺', '🦊', '🐻', '🐹', '🐭', '🦉', '🐝', '🦓', '🐍'
+  ];
+
+  const EMOJIS = [
+    ...ANIMALS,
     '⭐', '🌈', '🎈', '🎉', '🍎', '🍌', '🍓', '🍕', '🎵', '☀️',
     '🌙', '⚡', '❤️', '💜', '💛', '💚', '🚗', '🚀', '⚽', '🎨',
-    '🦋', '🐢', '🐬', '🐥', '🍭', '🍦', '🧸', '🎁', '🔥', '✨'
+    '🍭', '🍦', '🧸', '🎁', '🔥', '✨'
   ];
 
   const MAX_EMOJIS = 60;
   let activeCount = 0;
   let audioCtx = null;
+  let fullscreenRequested = false;
 
   function getAudioCtx() {
     if (!audioCtx) {
@@ -53,6 +60,24 @@
     return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
   }
 
+  function pickAnimal() {
+    return ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  }
+
+  function requestFullscreenOnce() {
+    if (fullscreenRequested) return;
+    fullscreenRequested = true;
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (!req) return;
+    try {
+      const result = req.call(el);
+      if (result && result.catch) result.catch(() => {});
+    } catch (err) {
+      /* ignore: fullscreen isn't available on some mobile browsers */
+    }
+  }
+
   function spawnEmoji(x, y) {
     if (activeCount >= MAX_EMOJIS) return;
     activeCount++;
@@ -61,7 +86,7 @@
     el.className = 'emoji-pop';
     el.textContent = pickEmoji();
 
-    const size = randomBetween(2.2, 4.2);
+    const size = randomBetween(3.2, 5.8);
     el.style.fontSize = size + 'rem';
     el.style.left = x + 'px';
     el.style.top = y + 'px';
@@ -111,28 +136,19 @@
     }, 500);
   }
 
-  function keyLabel(e) {
-    if (e.key === ' ') return '␣';
-    if (e.key.length === 1) return e.key.toUpperCase();
-    const map = {
-      Enter: '⏎', Backspace: '⌫', Tab: '⇥', Escape: 'Esc',
-      ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→',
-      Shift: '⇧', Control: 'Ctrl', Alt: 'Alt', Meta: '⌘'
-    };
-    return map[e.key] || e.key;
-  }
-
   window.addEventListener('keydown', (e) => {
     if (e.repeat) return;
+    requestFullscreenOnce();
     hideHint();
     playPop();
-    showKeyBadge(keyLabel(e));
+    showKeyBadge(pickAnimal());
     const x = randomBetween(window.innerWidth * 0.2, window.innerWidth * 0.8);
     const y = randomBetween(window.innerHeight * 0.25, window.innerHeight * 0.75);
     spawnBurst(x, y, 3);
   });
 
   function handlePointer(x, y) {
+    requestFullscreenOnce();
     hideHint();
     playPop();
     spawnBurst(x, y, 5);
