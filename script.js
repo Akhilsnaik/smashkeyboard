@@ -5,18 +5,19 @@
 
   const ANIMALS = [
     '🐶', '🐱', '🐰', '🦁', '🐸', '🐵', '🐨', '🐼', '🦄', '🐷',
-    '🦋', '🐢', '🐬', '🐥', '🐘', '🦒', '🐮', '🐔', '🐙', '🐳',
-    '🐺', '🦊', '🐻', '🐹', '🐭', '🦉', '🐝', '🦓', '🐍'
+    '🦋', '🐢', '🐬', '🐥', '🐘', '🦒', '🐮', '🦊', '🐻'
   ];
 
-  const EMOJIS = [
-    ...ANIMALS,
-    '⭐', '🌈', '🎈', '🎉', '🍎', '🍌', '🍓', '🍕', '🎵', '☀️',
-    '🌙', '⚡', '❤️', '💜', '💛', '💚', '🚗', '🚀', '⚽', '🎨',
-    '🍭', '🍦', '🧸', '🎁', '🔥', '✨'
+  const STARS = ['⭐', '🌟', '✨'];
+
+  const KID_FAVORITES = [
+    '🌈', '🎈', '🎉', '❤️', '💛', '💚', '💜', '🧸', '🎁',
+    '☀️', '🌙', '🍎', '🍓', '🍌', '🍕', '🍦', '🍭'
   ];
 
-  const MAX_EMOJIS = 60;
+  const EMOJIS = [...ANIMALS, ...STARS, ...KID_FAVORITES];
+
+  const MAX_EMOJIS = 30;
   let activeCount = 0;
   let audioCtx = null;
   let fullscreenRequested = false;
@@ -151,7 +152,7 @@
     requestFullscreenOnce();
     hideHint();
     playPop();
-    spawnBurst(x, y, 5);
+    spawnBurst(x, y, 3);
   }
 
   stage.addEventListener('pointerdown', (e) => {
