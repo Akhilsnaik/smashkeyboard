@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://akhilsnaik.github.io/smashkeyboard/sitemap.xml
