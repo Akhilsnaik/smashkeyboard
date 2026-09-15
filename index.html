@@ -12,12 +12,14 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main id="stage" aria-label="Smash the keyboard or tap the screen">
+  <main id="stage" aria-label="Type anything or tap the screen">
     <div class="hint">
       <div class="hint-emoji">⌨️ ✨ 👆</div>
-      <p>Press any key<br /><span>or tap anywhere</span></p>
+      <p>Start typing<br /><span>or tap anywhere</span></p>
     </div>
-    <div id="keyBadge" class="key-badge" aria-hidden="true"></div>
+    <div id="typedLine" class="typed-line" aria-hidden="true">
+      <span id="cursor" class="cursor">|</span>
+    </div>
   </main>
 
   <script src="script.js"></script>
