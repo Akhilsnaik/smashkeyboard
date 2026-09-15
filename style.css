@@ -35,13 +35,17 @@ body {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   cursor: pointer;
   background: linear-gradient(120deg, var(--bg-a), var(--bg-b), var(--bg-c), var(--bg-d));
   background-size: 300% 300%;
   animation: driftBg 24s ease-in-out infinite;
+}
+
+#stage > .hint,
+#stage > .typed-line {
+  grid-area: 1 / 1;
 }
 
 @keyframes driftBg {
@@ -137,7 +141,7 @@ body {
 }
 
 .typed-emoji {
-  font-size: var(--typed-size);
+  font-size: min(var(--typed-size), 13vw);
   margin: 0 0.05em;
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.15));
   animation: typeIn 0.32s cubic-bezier(0.2, 0.8, 0.3, 1) both;
@@ -170,7 +174,7 @@ body {
 }
 
 .cursor {
-  font-size: var(--typed-size);
+  font-size: min(var(--typed-size), 13vw);
   font-weight: 300;
   color: var(--text);
   opacity: 0.55;
@@ -182,6 +186,54 @@ body {
   50%, 100% { opacity: 0; }
 }
 
+.popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.3);
+  font-size: clamp(3.5rem, 20vw, 7rem);
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2));
+  z-index: 5;
+}
+
+.popup.show {
+  animation: popupBurst 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes popupBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 1;
+  }
+  65% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .typed-line {
+    max-width: 96vw;
+    max-height: 72vh;
+    padding: 0.8rem 1rem;
+    border-radius: 24px;
+  }
+
+  .hint {
+    padding: 0 16px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #stage {
     animation: none;
@@ -191,5 +243,8 @@ body {
   }
   .typed-emoji {
     animation-duration: 0.15s !important;
+  }
+  .popup.show {
+    animation-duration: 0.2s !important;
   }
 }

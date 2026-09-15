@@ -3,6 +3,7 @@
   const hint = document.querySelector('.hint');
   const typedLine = document.getElementById('typedLine');
   const cursor = document.getElementById('cursor');
+  const popup = document.getElementById('popup');
 
   const ANIMALS = [
     '🐶', '🐱', '🐰', '🦁', '🐸', '🐵', '🐨', '🐼', '🦄', '🐷',
@@ -28,7 +29,8 @@
 
   let audioCtx = null;
   let fullscreenRequested = false;
-  let typedCount = 0;
+  let visibleCount = 0;
+  let totalTyped = 0;
 
   function getAudioCtx() {
     if (!audioCtx) {
@@ -90,35 +92,48 @@
   }
 
   function updateFontScale() {
-    const t = Math.min(typedCount / MAX_CHARS, 1);
+    const t = Math.min(visibleCount / MAX_CHARS, 1);
     const eased = 1 - Math.pow(1 - t, 2);
     const size = MAX_FONT_REM - (MAX_FONT_REM - MIN_FONT_REM) * eased;
     typedLine.style.setProperty('--typed-size', size.toFixed(2) + 'rem');
   }
 
-  function isFull() {
-    return typedCount >= MAX_CHARS;
+  function showPopup(emoji) {
+    popup.textContent = emoji;
+    popup.classList.remove('show');
+    void popup.offsetWidth;
+    popup.classList.add('show');
+  }
+
+  function trimToCapacity() {
+    while (visibleCount >= MAX_CHARS) {
+      const oldest = typedLine.firstElementChild;
+      if (!oldest || oldest === cursor) break;
+      const wasEmoji = oldest.classList.contains('typed-emoji');
+      oldest.remove();
+      if (wasEmoji) visibleCount--;
+    }
   }
 
   function appendTyped() {
-    if (isFull()) {
-      playPop(160);
-      return;
-    }
+    trimToCapacity();
 
-    if (typedCount > 0 && typedCount % GROUP_SIZE === 0) {
+    if (totalTyped > 0 && totalTyped % GROUP_SIZE === 0) {
       const space = document.createElement('span');
       space.className = 'typed-space';
       typedLine.insertBefore(space, cursor);
     }
 
+    const emoji = pickEmoji();
     const el = document.createElement('span');
     el.className = 'typed-emoji';
-    el.textContent = pickEmoji();
+    el.textContent = emoji;
     typedLine.insertBefore(el, cursor);
 
-    typedCount++;
+    visibleCount++;
+    totalTyped++;
     updateFontScale();
+    showPopup(emoji);
     playPop();
   }
 
@@ -127,7 +142,8 @@
     if (!last) return;
 
     if (last.classList.contains('typed-emoji')) {
-      typedCount--;
+      visibleCount--;
+      totalTyped--;
       updateFontScale();
     }
 
@@ -139,7 +155,8 @@
     while (typedLine.firstElementChild && typedLine.firstElementChild !== cursor) {
       typedLine.firstElementChild.remove();
     }
-    typedCount = 0;
+    visibleCount = 0;
+    totalTyped = 0;
     updateFontScale();
   }
 
