@@ -18,13 +18,17 @@
 
   const EMOJIS = [...ANIMALS, ...STARS, ...KID_FAVORITES];
 
-  const MAX_VISIBLE = 22;
+  const MAX_CHARS = 100;
+  const GROUP_SIZE = 5;
+  const MIN_FONT_REM = 1.15;
+  const MAX_FONT_REM = 4;
   const MODIFIER_KEYS = new Set([
     'Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab', 'Escape', 'ContextMenu', 'OS'
   ]);
 
   let audioCtx = null;
   let fullscreenRequested = false;
+  let typedCount = 0;
 
   function getAudioCtx() {
     if (!audioCtx) {
@@ -85,22 +89,48 @@
     }
   }
 
+  function updateFontScale() {
+    const t = Math.min(typedCount / MAX_CHARS, 1);
+    const eased = 1 - Math.pow(1 - t, 2);
+    const size = MAX_FONT_REM - (MAX_FONT_REM - MIN_FONT_REM) * eased;
+    typedLine.style.setProperty('--typed-size', size.toFixed(2) + 'rem');
+  }
+
+  function isFull() {
+    return typedCount >= MAX_CHARS;
+  }
+
   function appendTyped() {
+    if (isFull()) {
+      playPop(160);
+      return;
+    }
+
+    if (typedCount > 0 && typedCount % GROUP_SIZE === 0) {
+      const space = document.createElement('span');
+      space.className = 'typed-space';
+      typedLine.insertBefore(space, cursor);
+    }
+
     const el = document.createElement('span');
     el.className = 'typed-emoji';
     el.textContent = pickEmoji();
     typedLine.insertBefore(el, cursor);
 
-    while (typedLine.children.length - 1 > MAX_VISIBLE) {
-      const oldest = typedLine.firstElementChild;
-      if (!oldest || oldest === cursor) break;
-      oldest.remove();
-    }
+    typedCount++;
+    updateFontScale();
+    playPop();
   }
 
   function removeLastTyped() {
     const last = cursor.previousElementSibling;
     if (!last) return;
+
+    if (last.classList.contains('typed-emoji')) {
+      typedCount--;
+      updateFontScale();
+    }
+
     last.classList.add('removing');
     last.addEventListener('transitionend', () => last.remove(), { once: true });
   }
@@ -109,6 +139,8 @@
     while (typedLine.firstElementChild && typedLine.firstElementChild !== cursor) {
       typedLine.firstElementChild.remove();
     }
+    typedCount = 0;
+    updateFontScale();
   }
 
   function celebrate() {
@@ -160,14 +192,12 @@
     }
 
     if (e.repeat) return;
-    playPop();
     appendTyped();
   });
 
   stage.addEventListener('pointerdown', () => {
     requestFullscreenOnce();
     hideHint();
-    playPop();
     appendTyped();
   });
 })();
