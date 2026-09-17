@@ -96,6 +96,7 @@
     const eased = 1 - Math.pow(1 - t, 2);
     const size = MAX_FONT_REM - (MAX_FONT_REM - MIN_FONT_REM) * eased;
     typedLine.style.setProperty('--typed-size', size.toFixed(2) + 'rem');
+    typedLine.classList.toggle('has-content', visibleCount > 0);
   }
 
   function showPopup(emoji) {
